@@ -30,7 +30,12 @@ stderr "${c_step}[2] Reducing log level${c_norm}"
 cp "${SPARK_HOME}"/conf/log4j.properties.template "${SPARK_HOME}"/conf/log4j.properties
 sed -ibak 's/rootCategory=INFO/rootCategory=ERROR/g' "${SPARK_HOME}"/conf/log4j.properties
 
-stderr "${c_step}[3] Testing setup${c_norm}"
+stderr "${c_step}[3] Adding S3 support${c_norm}"
+curl -s -o "${SPARK_HOME}/jars/hadoop-aws-2.7.3.jar" https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/2.7.3/hadoop-aws-2.7.3.jar && \
+curl -s -o "${SPARK_HOME}/jars/aws-java-sdk-1.7.4.jar" http://central.maven.org/maven2/com/amazonaws/aws-java-sdk/1.7.4/aws-java-sdk-1.7.4.jar
+cp infra/docker/conf/spark-defaults.conf "${SPARK_HOME}/conf/spark-defaults.conf"
+
+stderr "${c_step}[4] Testing setup${c_norm}"
 echo 'sc.parallelize(1 to 100).count()' | "${SPARK_HOME}"/bin/spark-shell
 rm -rf derby.log metastore_db
 

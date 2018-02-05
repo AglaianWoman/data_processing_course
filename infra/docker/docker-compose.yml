@@ -1,22 +1,49 @@
-version: '2'
+version: '3'
 services:
   master:
     image: luisbelloch/spark
-    ports:
-      - 8080:8080
     command: /opt/spark/sbin/start-master.sh
+    networks: [spark]
+    ports:
+      - 6066:6066
+      - 7077:7077
+      - 8080:8080
     environment:
       MASTER: spark://master:7077
       SPARK_PUBLIC_DNS: localhost
       SPARK_NO_DAEMONIZE: 1
+
   worker:
     image: luisbelloch/spark    
     command: /opt/spark/sbin/start-slave.sh spark://master:7077
+    networks: [spark]
+    depends_on:
+      - master
+      - minio
+    ports:
+      - 8081:8081
+      # Yeah, port festival, classic :-)
+      # - 8081
+      # - 8081-8180:8081
     environment:      
       SPARK_PUBLIC_DNS: localhost
       SPARK_NO_DAEMONIZE: 1
-    # Yeah, port festival, classic :-)
-    # ports:
-      # - 8081:8081
-    links:
-      - master
+
+  minio:
+    image: minio/minio
+    command: server /data
+    volumes:
+      - minio:/data
+    networks: [spark]
+    ports:
+      - 9000:9000
+    environment:
+      MINIO_ACCESS_KEY: JX6SNZEW2CLYM66UDHT7
+      MINIO_SECRET_KEY: NHtuFRcy8XnRuqbASsHTK65oxYMQ7sNvwTnA1oX0
+
+networks:
+  spark:
+
+volumes:
+  minio:
+

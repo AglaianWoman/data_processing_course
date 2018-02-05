@@ -75,7 +75,7 @@ Running `docker ps` will show containers and their ports mapped. Slaves can conn
 To scale up/down the cluster:
 
 ```
-$ docker-compose scale worker=3
+$ docker-compose up -d --scale worker=3
 ```
 
 Beware desired state persist between runs.
